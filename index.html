@@ -65,15 +65,15 @@
 }
     .welcome-logo span { color: var(--cyan); }
  .welcome-tagline {
-  font-size: 0.9rem;
+  font-size: clamp(0.65rem, 3vw, 0.9rem);
   color: var(--muted);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 500;
   opacity: 0;
   animation: wFadeUp 0.7s ease 0.6s forwards;
   max-width: 90vw;
-  word-break: break-word;
+  white-space: nowrap;
 }
     .welcome-bar-wrap {
       width: min(240px, 60vw);
@@ -694,7 +694,7 @@
 <!-- ═══ WELCOME SCREEN ═══ -->
 <div id="welcome-screen">
   <div class="welcome-logo">Welcome to <span>My Portofolio</span></div>
-  <div class="welcome-tagline">Rafi Khairul Azzam &nbsp;·&nbsp; IT Technical</div>
+  <div class="welcome-tagline">Rafi Khairul Azzam · Junior IT Technical</div>
   <div class="welcome-bar-wrap">
     <div class="welcome-bar"></div>
   </div>
