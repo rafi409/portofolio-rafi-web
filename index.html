@@ -53,17 +53,18 @@
       pointer-events: none;
     }
     .welcome-logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: -0.03em;
-      opacity: 0;
-      transform: translateY(16px);
-      animation: wFadeUp 0.7s ease 0.3s forwards;
-    }
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.2rem, 5.5vw, 2.8rem);
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.03em;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: wFadeUp 0.7s ease 0.3s forwards;
+  white-space: nowrap;
+}
     .welcome-logo span { color: var(--cyan); }
-    .welcome-tagline {
+ .welcome-tagline {
   font-size: 0.9rem;
   color: var(--muted);
   letter-spacing: 0.12em;
@@ -693,7 +694,7 @@
 <!-- ═══ WELCOME SCREEN ═══ -->
 <div id="welcome-screen">
   <div class="welcome-logo">Welcome to <span>My Portofolio</span></div>
-  <div class="welcome-tagline">Rafi Khairul Azzam &nbsp;·&nbsp; Junior IT Technical</div>
+  <div class="welcome-tagline">Rafi Khairul Azzam &nbsp;·&nbsp; IT Technical</div>
   <div class="welcome-bar-wrap">
     <div class="welcome-bar"></div>
   </div>
