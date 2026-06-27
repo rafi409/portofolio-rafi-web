@@ -683,6 +683,24 @@
       .about-img-wrap { aspect-ratio: 1; max-width: 300px; margin: 0 auto; }
       section { padding: 4.5rem 5%; }
       .stat-row { grid-template-columns: repeat(3, 1fr); }
+      .contact-card {
+    padding: 2rem 1.2rem;
+  }
+  .contact-card p {
+    text-align: left;
+  }
+  .contact-links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .contact-link {
+    justify-content: center;
+  }
+  #contact .section-title {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    text-align: center;
+  }
+}
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
