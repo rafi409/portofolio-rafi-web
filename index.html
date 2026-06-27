@@ -23,6 +23,12 @@
 
     html { scroll-behavior: smooth; }
 
+    /* Class ini dipasang via JS saat hero lock aktif */
+    html.scroll-locked,
+    body.scroll-locked {
+      overflow: hidden !important;
+    }
+
     body {
       background: var(--navy);
       color: var(--white);
@@ -32,49 +38,64 @@
       overflow-x: hidden;
     }
 
+    /* ═══ PAGE TRANSITION ═══ */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: var(--navy);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+    .page-transition.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
     /* ═══ WELCOME SCREEN ═══ */
-   #welcome-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: var(--navy);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  text-align: center;
-  transition: opacity 0.9s ease, transform 0.9s ease;
-}
+    #welcome-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      text-align: center;
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
     #welcome-screen.fade-out {
       opacity: 0;
       transform: scale(1.04);
       pointer-events: none;
     }
     .welcome-logo {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(1.2rem, 5.5vw, 2.8rem);
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -0.03em;
-  opacity: 0;
-  transform: translateY(16px);
-  animation: wFadeUp 0.7s ease 0.3s forwards;
-  white-space: nowrap;
-}
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.2rem, 5.5vw, 2.8rem);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.03em;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: wFadeUp 0.7s ease 0.3s forwards;
+      white-space: nowrap;
+    }
     .welcome-logo span { color: var(--cyan); }
- .welcome-tagline {
-  font-size: clamp(0.65rem, 3vw, 0.9rem);
-  color: var(--muted);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 500;
-  opacity: 0;
-  animation: wFadeUp 0.7s ease 0.6s forwards;
-  max-width: 90vw;
-  white-space: nowrap;
-}
+    .welcome-tagline {
+      font-size: clamp(0.65rem, 3vw, 0.9rem);
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      opacity: 0;
+      animation: wFadeUp 0.7s ease 0.6s forwards;
+      max-width: 90vw;
+      white-space: nowrap;
+    }
     .welcome-bar-wrap {
       width: min(240px, 60vw);
       height: 3px;
@@ -121,16 +142,74 @@
       50%       { opacity: 1;   transform: scale(1.4); }
     }
 
-    /* ═══════════════════════════════════════
-       BACKGROUND CANVAS — full-page animated
-       ═══════════════════════════════════════ */
+    /* ═══ HERO LOCK OVERLAY ═══ */
+    /* Overlay transparan yang mencegah scroll saat di hero */
+    #hero-lock {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      /* Tidak terlihat tapi menangkap touch/wheel events */
+      background: transparent;
+      pointer-events: none;
+    }
+    #hero-lock.active {
+      pointer-events: all;
+    }
+
+    /* ═══ SCROLL HINT (panah bounce di hero) ═══ */
+    .hero-scroll-hint {
+      position: fixed;
+      bottom: 0.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+      background: rgba(10,14,26,0.85);
+      padding: 0.45rem 0.9rem 0.55rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      max-width: 90vw;
+    }
+    .hero-scroll-hint.visible {
+      opacity: 1;
+    }
+    .hero-scroll-hint span {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .hint-arrow {
+      width: 16px;
+      height: 16px;
+      border-right: 2px solid var(--cyan);
+      border-bottom: 2px solid var(--cyan);
+      transform: rotate(45deg);
+      animation: bounceArrow 1.4s ease infinite;
+    }
+    .hint-arrow:nth-child(2) { animation-delay: 0.15s; opacity: 0.6; }
+    .hint-arrow:nth-child(3) { animation-delay: 0.3s;  opacity: 0.3; }
+    @keyframes bounceArrow {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50%       { transform: rotate(45deg) translateY(5px); }
+    }
+
+    /* ═══ BACKGROUND CANVAS ═══ */
     #bg-canvas {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
     }
-
     .aurora-layer {
       position: fixed;
       inset: 0;
@@ -149,63 +228,48 @@
       width: 700px; height: 700px;
       background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%);
       top: -15%; left: -10%;
-      animation-duration: 28s;
-      animation-delay: 0s;
+      animation-duration: 28s; animation-delay: 0s;
     }
     .aurora-blob:nth-child(2) {
       width: 500px; height: 500px;
       background: radial-gradient(circle, rgba(100,60,255,0.1) 0%, transparent 70%);
       top: 20%; right: -8%;
-      animation-duration: 22s;
-      animation-delay: -8s;
+      animation-duration: 22s; animation-delay: -8s;
     }
     .aurora-blob:nth-child(3) {
       width: 600px; height: 600px;
       background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
       bottom: 10%; left: 30%;
-      animation-duration: 32s;
-      animation-delay: -15s;
+      animation-duration: 32s; animation-delay: -15s;
     }
     .aurora-blob:nth-child(4) {
       width: 400px; height: 400px;
       background: radial-gradient(circle, rgba(255,209,102,0.06) 0%, transparent 70%);
       top: 60%; right: 20%;
-      animation-duration: 26s;
-      animation-delay: -4s;
+      animation-duration: 26s; animation-delay: -4s;
     }
     @keyframes auroraFloat {
-      0%   { opacity: 0;    transform: translate(0,    0)    scale(1);   }
+      0%   { opacity: 0;    transform: translate(0, 0)       scale(1);    }
       10%  { opacity: 1; }
       50%  { opacity: 0.8;  transform: translate(40px, 60px) scale(1.15); }
       90%  { opacity: 1; }
-      100% { opacity: 0;    transform: translate(0,    0)    scale(1);   }
+      100% { opacity: 0;    transform: translate(0, 0)       scale(1);    }
     }
 
     .grid-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image: radial-gradient(circle, rgba(0,212,255,0.06) 1px, transparent 1px);
       background-size: 48px 48px;
       mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
       -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
     }
-
     .scanline {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 3px,
-        rgba(0,212,255,0.012) 3px,
-        rgba(0,212,255,0.012) 4px
+        0deg, transparent, transparent 3px,
+        rgba(0,212,255,0.012) 3px, rgba(0,212,255,0.012) 4px
       );
     }
-
     .cursor-glow {
       position: fixed;
       width: 340px; height: 340px;
@@ -219,7 +283,7 @@
 
     nav, section, footer { position: relative; z-index: 2; }
 
-    /* NAVBAR */
+    /* ═══ NAVBAR ═══ */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
@@ -231,74 +295,93 @@
       transition: padding 0.3s, background 0.3s;
     }
     nav.scrolled { padding: 0.8rem 5%; background: rgba(10,14,26,0.92); }
-
     .logo {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: var(--white);
-      text-decoration: none;
+      font-weight: 700; font-size: 1.3rem;
+      color: var(--white); text-decoration: none;
       letter-spacing: -0.02em;
     }
     .logo span { color: var(--cyan); }
-
     .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.2s;
-      position: relative;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.2s; position: relative;
     }
     .nav-links a::after {
-      content: '';
-      position: absolute; bottom: -4px; left: 0;
-      width: 0; height: 2px;
-      background: var(--cyan);
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px; background: var(--cyan);
       transition: width 0.3s ease;
     }
     .nav-links a:hover { color: var(--white); }
     .nav-links a:hover::after { width: 100%; }
 
     .hamburger {
-      display: none;
-      flex-direction: column; gap: 5px;
-      cursor: pointer; padding: 4px;
-      background: none; border: none;
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 4px; background: none; border: none;
     }
     .hamburger span {
       display: block; width: 26px; height: 2px;
-      background: var(--white);
-      border-radius: 2px;
+      background: var(--white); border-radius: 2px;
       transition: transform 0.35s ease, opacity 0.35s ease;
     }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+    /* ═══ MOBILE MENU ═══ */
     .mobile-menu {
-      display: none;
-      position: fixed; inset: 0; z-index: 99;
-      background: rgba(10,14,26,0.97);
-      backdrop-filter: blur(20px);
-      flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 2.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.35s ease;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; right: 0;
+      width: min(280px, 80vw); height: 100vh;
+      z-index: 99;
+      background: rgba(10,14,26,0.98);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid var(--border);
+      padding: 5rem 1.5rem 2rem;
+      gap: 0.2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateX(100%);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(.22,.61,.36,1);
     }
-    .mobile-menu.open { display: flex; opacity: 1; pointer-events: all; }
+    .mobile-menu.open {
+      opacity: 1; pointer-events: all; transform: translateX(0);
+    }
     .mobile-menu a {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 2rem; font-weight: 700;
-      color: var(--white); text-decoration: none;
-      transition: color 0.2s;
+      font-size: 0.95rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      padding: 0.75rem 1rem; border-radius: 10px;
+      border: 1px solid transparent;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+      display: flex; align-items: center; gap: 0.85rem;
+      letter-spacing: 0.01em;
     }
-    .mobile-menu a:hover { color: var(--cyan); }
+    .mobile-menu a svg {
+      opacity: 0.5;
+      transition: opacity 0.2s, stroke 0.2s;
+      flex-shrink: 0;
+    }
+    .mobile-menu a:hover svg,
+    .mobile-menu a:active svg {
+      opacity: 1;
+      stroke: var(--cyan);
+    }
+    .mobile-menu a:hover, .mobile-menu a:active {
+      color: var(--white);
+      background: rgba(0,212,255,0.05);
+      border-color: var(--border);
+    }
+    /* Divider tipis antar item */
+    .mobile-menu a + a {
+      border-top: 1px solid rgba(255,255,255,0.03);
+    }
+    .mobile-menu a:hover + a,
+    .mobile-menu a:hover {
+      border-color: transparent;
+    }
 
-    /* SECTIONS */
+    /* ═══ SECTIONS ═══ */
     section { padding: 6rem 5%; }
     .section-label {
       font-size: 0.75rem; font-weight: 600;
@@ -309,36 +392,27 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700; line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: var(--white);
+      letter-spacing: -0.02em; color: var(--white);
       margin-bottom: 1rem;
     }
     .section-sub {
-      color: var(--muted); font-size: 1rem; max-width: 520px;
-      margin-bottom: 3rem;
+      color: var(--muted); font-size: 1rem;
+      max-width: 520px; margin-bottom: 3rem;
     }
 
-    /* HERO */
-    #hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      padding-top: 6rem;
-    }
+    /* ═══ HERO ═══ */
+    #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 6rem; }
     .hero-inner { position: relative; z-index: 1; max-width: 750px; }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 0.5rem;
-      background: rgba(0,212,255,0.1);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      padding: 0.4rem 1rem;
+      background: rgba(0,212,255,0.1); border: 1px solid var(--border);
+      border-radius: 99px; padding: 0.4rem 1rem;
       font-size: 0.8rem; color: var(--cyan);
-      margin-bottom: 1.5rem;
-      font-weight: 500;
+      margin-bottom: 1.5rem; font-weight: 500;
     }
     .hero-badge::before {
       content: ''; width: 6px; height: 6px;
-      background: var(--cyan);
-      border-radius: 50%;
+      background: var(--cyan); border-radius: 50%;
       animation: blink 1.5s infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
@@ -346,34 +420,29 @@
     .hero-name {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2.8rem, 8vw, 5.5rem);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      line-height: 1.0;
-      margin-bottom: 1rem;
+      font-weight: 700; letter-spacing: -0.04em;
+      line-height: 1.0; margin-bottom: 1rem;
     }
     .hero-name .highlight { color: var(--cyan); }
-
     .typing-wrap {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.2rem, 3vw, 1.8rem);
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 1.8rem;
-      min-height: 2.5rem;
+      font-weight: 500; color: var(--muted);
+      margin-bottom: 1.8rem; min-height: 2.5rem;
     }
     .typing-text { color: var(--gold); }
-    .cursor { display: inline-block; width: 2px; background: var(--gold); animation: blink 0.8s infinite; margin-left: 2px; }
-
+    .cursor {
+      display: inline-block; width: 2px; background: var(--gold);
+      animation: blink 0.8s infinite; margin-left: 2px;
+    }
     .hero-desc {
       color: var(--muted); font-size: 1.05rem;
       max-width: 500px; margin-bottom: 2.5rem; line-height: 1.75;
     }
-
     .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
     .btn {
       display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.85rem 1.8rem;
-      border-radius: 10px;
+      padding: 0.85rem 1.8rem; border-radius: 10px;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 600; font-size: 0.95rem;
       text-decoration: none;
@@ -382,17 +451,25 @@
     }
     .btn:hover { transform: translateY(-2px); }
     .btn-primary {
-      background: var(--cyan);
-      color: var(--navy);
+      background: var(--cyan); color: var(--navy);
       box-shadow: 0 0 24px rgba(0,212,255,0.3);
     }
     .btn-primary:hover { box-shadow: 0 0 36px rgba(0,212,255,0.5); }
     .btn-outline {
-      background: transparent;
-      color: var(--white);
+      background: transparent; color: var(--white);
       border: 1.5px solid var(--border);
     }
     .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* tombol Jelajahi diberi glow hint */
+    #exploreBtn {
+      position: relative;
+      animation: exploreGlow 2.5s ease-in-out infinite;
+    }
+    @keyframes exploreGlow {
+      0%,100% { border-color: rgba(0,212,255,0.2); box-shadow: none; }
+      50%      { border-color: var(--cyan); box-shadow: 0 0 18px rgba(0,212,255,0.25); }
+    }
 
     .hero-scroll {
       position: absolute; bottom: 2.5rem; left: 5%;
@@ -404,53 +481,29 @@
       animation: scrollAnim 2s infinite;
     }
     @keyframes scrollAnim {
-      0%{transform:scaleX(0);transform-origin:left}
-      50%{transform:scaleX(1);transform-origin:left}
-      51%{transform:scaleX(1);transform-origin:right}
-      100%{transform:scaleX(0);transform-origin:right}
+      0%  { transform:scaleX(0); transform-origin:left }
+      50% { transform:scaleX(1); transform-origin:left }
+      51% { transform:scaleX(1); transform-origin:right }
+      100%{ transform:scaleX(0); transform-origin:right }
     }
 
-    /* ABOUT */
+    /* ═══ ABOUT ═══ */
     #about { background: rgba(17,24,39,0.7); }
     .about-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 4rem;
-      align-items: center;
+      display: grid; grid-template-columns: 280px 1fr;
+      gap: 4rem; align-items: center;
     }
     .about-img-wrap {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      width: 280px;
-      height: 373px;
-      background: var(--card);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      flex-shrink: 0;
+      position: relative; border-radius: 12px; overflow: hidden;
+      width: 280px; height: 373px; background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto; flex-shrink: 0;
     }
-    .about-avatar {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-    }
+    .about-avatar { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
     .about-img-wrap::before {
-      content: '';
-      position: absolute; inset: 0;
-      border: 2px solid var(--border);
-      border-radius: 12px;
+      content: ''; position: absolute; inset: 0;
+      border: 2px solid var(--border); border-radius: 12px;
       z-index: 1; pointer-events: none;
-    }
-    .about-img-wrap::after {
-      content: '';
-      position: absolute; bottom: -8px; right: -8px;
-      width: 60%; height: 60%;
-      border: 2px solid rgba(0,212,255,0.3);
-      border-radius: 12px;
-      z-index: 0;
     }
     .stat-row {
       display: grid; grid-template-columns: repeat(3, 1fr);
@@ -459,21 +512,17 @@
     .stat-item { text-align: center; }
     .stat-num {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 2rem; font-weight: 700;
-      color: var(--cyan);
+      font-size: 2rem; font-weight: 700; color: var(--cyan);
     }
     .stat-label { font-size: 0.8rem; color: var(--muted); }
 
-    /* SKILLS */
+    /* ═══ SKILLS ═══ */
     .skills-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
     }
     .skill-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.8rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.8rem;
       transition: border-color 0.3s, transform 0.3s;
     }
     .skill-card:hover { border-color: var(--cyan); transform: translateY(-4px); }
@@ -481,8 +530,7 @@
     .skill-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; margin-bottom: 0.4rem; }
     .skill-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.2rem; }
     .skill-bar-wrap {
-      background: rgba(255,255,255,0.05);
-      border-radius: 99px; height: 5px; overflow: hidden;
+      background: rgba(255,255,255,0.05); border-radius: 99px; height: 5px; overflow: hidden;
     }
     .skill-bar {
       height: 100%; border-radius: 99px;
@@ -492,21 +540,17 @@
     }
     .skill-bar.animated { transform: scaleX(1); }
 
-    /* EXPERIENCE */
+    /* ═══ EXPERIENCE ═══ */
     #experience { background: rgba(17,24,39,0.7); }
     .timeline { position: relative; padding-left: 2rem; }
     .timeline::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0;
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
       width: 1px; background: var(--border);
     }
-    .timeline-item {
-      position: relative; margin-bottom: 3rem; padding-left: 1.5rem;
-    }
+    .timeline-item { position: relative; margin-bottom: 3rem; padding-left: 1.5rem; }
     .timeline-dot {
       position: absolute; left: -2.4rem; top: 0.35rem;
-      width: 12px; height: 12px;
-      border-radius: 50%; background: var(--cyan);
+      width: 12px; height: 12px; border-radius: 50%; background: var(--cyan);
       box-shadow: 0 0 12px rgba(0,212,255,0.5);
     }
     .timeline-period { font-size: 0.78rem; color: var(--cyan); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.35rem; }
@@ -514,55 +558,34 @@
     .timeline-company { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
     .timeline-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
 
-    /* CERTIFICATIONS */
+    /* ═══ CERTIFICATIONS ═══ */
     .certs-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
     }
     .cert-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
       transition: border-color 0.3s, transform 0.3s;
     }
     .cert-card:hover { border-color: var(--cyan); transform: translateY(-4px); }
-
     .cert-slider {
-      position: relative;
-      aspect-ratio: 4 / 3;
-      overflow: hidden;
+      position: relative; aspect-ratio: 4 / 3; overflow: hidden;
       background: linear-gradient(135deg, #0d1b2a 0%, #1a2744 100%);
-      touch-action: pan-y;
-      cursor: grab;
-      user-select: none;
+      touch-action: pan-y; cursor: grab; user-select: none;
     }
     .cert-slider.dragging { cursor: grabbing; }
-    .cert-slides {
-      display: flex;
-      height: 100%;
-      transition: transform 0.4s cubic-bezier(.22,.61,.36,1);
-    }
+    .cert-slides { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(.22,.61,.36,1); }
     .cert-slide { flex: 0 0 100%; width: 100%; height: 100%; }
     .cert-slide img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
-      -webkit-user-drag: none;
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; pointer-events: none; -webkit-user-drag: none;
     }
     .cert-arrow {
       position: absolute; top: 50%; transform: translateY(-50%);
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      background: rgba(10,14,26,0.55);
-      border: 1px solid rgba(0,212,255,0.3);
-      color: var(--white);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      font-size: 1.1rem;
-      line-height: 1;
-      z-index: 2;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(10,14,26,0.55); border: 1px solid rgba(0,212,255,0.3);
+      color: var(--white); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.1rem; line-height: 1; z-index: 2;
       transition: background 0.2s, border-color 0.2s;
     }
     .cert-arrow:hover { background: rgba(0,212,255,0.25); border-color: var(--cyan); }
@@ -570,31 +593,25 @@
     .cert-arrow-right { right: 0.6rem; }
     .cert-dots {
       position: absolute; bottom: 0.7rem; left: 0; right: 0;
-      display: flex; justify-content: center; gap: 6px;
-      z-index: 2;
+      display: flex; justify-content: center; gap: 6px; z-index: 2;
     }
     .cert-dot {
       width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.4);
-      border: none; padding: 0;
-      transition: background 0.2s, transform 0.2s;
-      cursor: pointer;
+      background: rgba(255,255,255,0.4); border: none; padding: 0;
+      transition: background 0.2s, transform 0.2s; cursor: pointer;
     }
     .cert-dot.active { background: var(--cyan); transform: scale(1.35); }
     .cert-body { padding: 1.2rem 1.4rem; }
     .cert-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem; color: var(--white); margin-bottom: 0.3rem; }
     .cert-issuer { font-size: 0.82rem; color: var(--muted); }
 
-    /* PROJECTS */
+    /* ═══ PROJECTS ═══ */
     .projects-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;
     }
     .project-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
       transition: border-color 0.3s, transform 0.3s;
     }
     .project-card:hover { border-color: var(--cyan); transform: translateY(-4px); }
@@ -602,65 +619,53 @@
       height: 180px;
       background: linear-gradient(135deg, #0d1b2a 0%, #1a2744 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 3rem;
-      position: relative; overflow: hidden;
+      font-size: 3rem; position: relative; overflow: hidden;
     }
     .project-thumb::before {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(135deg, rgba(0,212,255,0.08), transparent);
     }
     .project-thumb-img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: top center;
-      display: block;
+      width: 100%; height: 100%; object-fit: cover;
+      object-position: top center; display: block;
     }
     .project-body { padding: 1.5rem; }
     .project-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
     .tag {
-      font-size: 0.72rem; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 0.25rem 0.65rem;
-      border-radius: 99px;
-      background: rgba(0,212,255,0.1);
-      color: var(--cyan); border: 1px solid var(--border);
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.25rem 0.65rem; border-radius: 99px;
+      background: rgba(0,212,255,0.1); color: var(--cyan); border: 1px solid var(--border);
     }
     .project-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
     .project-desc { color: var(--muted); font-size: 0.87rem; line-height: 1.65; }
     .project-link {
       display: inline-flex; align-items: center; gap: 0.4rem;
       margin-top: 1rem; color: var(--cyan);
-      font-size: 0.85rem; font-weight: 600;
-      text-decoration: none;
+      font-size: 0.85rem; font-weight: 600; text-decoration: none;
       transition: gap 0.2s;
     }
     .project-link:hover { gap: 0.65rem; }
 
-    /* CONTACT */
+    /* ═══ CONTACT ═══ */
     #contact { text-align: center; }
     .contact-card {
-      max-width: 600px; margin: 0 auto;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
+      max-width: 600px; margin: 0 auto; background: var(--card);
+      border: 1px solid var(--border); border-radius: 24px; padding: 3rem 2.5rem;
     }
-    .contact-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
+    .contact-links {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem;
+    }
     .contact-link {
       display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.75rem 1.4rem;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      color: var(--white);
-      text-decoration: none; font-size: 0.9rem; font-weight: 500;
+      padding: 0.75rem 1.4rem; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      color: var(--white); text-decoration: none; font-size: 0.9rem; font-weight: 500;
       transition: border-color 0.2s, color 0.2s, transform 0.2s;
     }
     .contact-link:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
     .contact-link .icon { font-size: 1.1rem; }
 
-    /* FOOTER */
+    /* ═══ FOOTER ═══ */
     footer {
       text-align: center; padding: 1.5rem 5%;
       color: var(--muted); font-size: 0.8rem;
@@ -668,14 +673,14 @@
     }
     footer a { color: var(--cyan); text-decoration: none; }
 
-    /* REVEAL ANIMATION */
+    /* ═══ REVEAL ═══ */
     .reveal {
       opacity: 0; transform: translateY(30px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    /* RESPONSIVE */
+    /* ═══ RESPONSIVE ═══ */
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
@@ -683,24 +688,15 @@
       .about-img-wrap { aspect-ratio: 1; max-width: 300px; margin: 0 auto; }
       section { padding: 4.5rem 5%; }
       .stat-row { grid-template-columns: repeat(3, 1fr); }
-      .contact-card {
-    padding: 2rem 1.2rem;
-  }
-  .contact-card p {
-    text-align: left;
-  }
-  .contact-links {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .contact-link {
-    justify-content: center;
-  }
-  #contact .section-title {
-    font-size: clamp(1.4rem, 6vw, 2rem);
-    text-align: center;
-  }
-}
+      .contact-card { padding: 2rem 1.2rem; }
+      .contact-card p { text-align: left; }
+      .contact-links { flex-direction: column; align-items: stretch; }
+      .contact-link { justify-content: center; }
+      #contact .section-title { font-size: clamp(1.4rem, 6vw, 2rem); text-align: center; }
+
+      /* Hero: beri jarak bawah ekstra supaya tombol & scroll hint tidak bertumpukan */
+      #hero { padding-bottom: 4.5rem; }
+      .hero-scroll-hint { bottom: 0.6rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -709,16 +705,23 @@
 </head>
 <body>
 
+<!-- ═══ PAGE TRANSITION OVERLAY ═══ -->
+<div class="page-transition" id="pageTransition"></div>
+
 <!-- ═══ WELCOME SCREEN ═══ -->
 <div id="welcome-screen">
   <div class="welcome-logo">Welcome to <span>My Portofolio</span></div>
   <div class="welcome-tagline">Rafi Khairul Azzam · Junior IT Technical</div>
-  <div class="welcome-bar-wrap">
-    <div class="welcome-bar"></div>
-  </div>
-  <div class="welcome-dots">
-    <span></span><span></span><span></span>
-  </div>
+  <div class="welcome-bar-wrap"><div class="welcome-bar"></div></div>
+  <div class="welcome-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ═══ SCROLL HINT (panah bawah saat hero lock aktif) ═══ -->
+<div class="hero-scroll-hint" id="heroScrollHint">
+  <span>Klik tombol jelajahi portofolio untuk mulai</span>
+  <div class="hint-arrow"></div>
+  <div class="hint-arrow"></div>
+  <div class="hint-arrow"></div>
 </div>
 
 <!-- ═══ BACKGROUND LAYERS ═══ -->
@@ -731,11 +734,9 @@
 </div>
 <div class="grid-overlay"></div>
 <div class="scanline"></div>
-
-<!-- Cursor Glow -->
 <div class="cursor-glow" id="cursorGlow"></div>
 
-<!-- NAVBAR -->
+<!-- ═══ NAVBAR ═══ -->
 <nav id="navbar">
   <a href="#hero" class="logo">My Portofolio</a>
   <ul class="nav-links">
@@ -751,17 +752,35 @@
   </button>
 </nav>
 
-<!-- Mobile Menu -->
+<!-- ═══ MOBILE MENU ═══ -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#about" class="mob-link">Tentang</a>
-  <a href="#skills" class="mob-link">Keahlian</a>
-  <a href="#experience" class="mob-link">Pengalaman</a>
-  <a href="#certifications" class="mob-link">Sertifikasi</a>
-  <a href="#projects" class="mob-link">Proyek</a>
-  <a href="#contact" class="mob-link">Kontak</a>
+  <a href="#about" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Tentang
+  </a>
+  <a href="#skills" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Keahlian
+  </a>
+  <a href="#experience" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    Pengalaman
+  </a>
+  <a href="#certifications" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+    Sertifikasi
+  </a>
+  <a href="#projects" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Proyek
+  </a>
+  <a href="#contact" class="mob-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Kontak
+  </a>
 </div>
 
-<!-- HERO -->
+<!-- ═══ HERO ═══ -->
 <section id="hero">
   <div class="hero-inner">
     <div class="hero-badge">Welcome to the website</div>
@@ -775,17 +794,17 @@
       Saya membangun pengalaman digital yang dari segi fungsional sangat membantu kebutuhan industri juga UMKM. Semangat saya adalah menciptakan solusi bagi industri, juga bekerja dengan kualitas standar profesional, dan mampu bersaing di industri dan bermanfaat bagi masyarakat.
     </p>
     <div class="btn-group">
-      <a href="#projects" class="btn btn-primary">Lihat Proyek →</a>
-      <a href="#contact" class="btn btn-outline">Hubungi Saya</a>
+      <a href="#projects" class="btn btn-primary" onclick="unlockAndGo(event,'#projects')">Lihat Proyek →</a>
+      <a href="#about" class="btn btn-outline" id="exploreBtn" onclick="explorePortfolio(event)">Jelajahi Portfolio ↓</a>
     </div>
   </div>
   <div class="hero-scroll">
     <div class="scroll-line"></div>
-    <span>Scroll ke bawah</span>
+    <span>Let's Explore</span>
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- ═══ ABOUT ═══ -->
 <section id="about">
   <div class="about-grid">
     <div class="about-img-wrap reveal">
@@ -798,8 +817,9 @@
         Saya adalah Junior IT Engineer dengan pengalaman 6 bulan dalam industri junior IT Support. Saya Bergerak dalam bidang IT Support, yang bisa menjadi problem solving pada setiap kebutuhan perusahaan.
       </p>
       <p style="color:var(--muted); line-height:1.8; margin-bottom:2rem;">
-        Berlokasi di <strong style="color:var(--white)">Bogor, Jawa Barat</strong> — terbuka untuk peluang remote maupun on-site di seluruh Indonesia, dan luar negeri.</p>
-        <div class="stat-row">
+        Berlokasi di <strong style="color:var(--white)">Bogor, Jawa Barat</strong> — terbuka untuk peluang remote maupun on-site di seluruh Indonesia, dan luar negeri.
+      </p>
+      <div class="stat-row">
         <div class="stat-item">
           <div class="stat-num">6</div>
           <div class="stat-label">Bulan Pengalaman</div>
@@ -818,7 +838,7 @@
   </div>
 </section>
 
-<!-- SKILLS -->
+<!-- ═══ SKILLS ═══ -->
 <section id="skills">
   <div class="section-label reveal">Keahlian</div>
   <h2 class="section-title reveal">Apa yang Saya Kuasai</h2>
@@ -857,7 +877,7 @@
   </div>
 </section>
 
-<!-- EXPERIENCE -->
+<!-- ═══ EXPERIENCE ═══ -->
 <section id="experience">
   <div class="section-label reveal">Perjalanan Karir</div>
   <h2 class="section-title reveal">Pengalaman Kerja</h2>
@@ -871,7 +891,7 @@
   </div>
 </section>
 
-<!-- CERTIFICATIONS -->
+<!-- ═══ CERTIFICATIONS ═══ -->
 <section id="certifications">
   <div class="section-label reveal">Sertifikasi</div>
   <h2 class="section-title reveal">Sertifikasi & Pelatihan</h2>
@@ -892,7 +912,7 @@
         </div>
       </div>
       <div class="cert-body">
-        <div class="cert-name">Hasil Test IQ </div>
+        <div class="cert-name">Hasil Test IQ</div>
         <div class="cert-issuer">IQper · 2025</div>
       </div>
     </div>
@@ -915,9 +935,11 @@
         <div class="cert-issuer">nevtik · 2026</div>
       </div>
     </div>
+
+  </div>
 </section>
 
-<!-- PROJECTS -->
+<!-- ═══ PROJECTS ═══ -->
 <section id="projects">
   <div class="section-label reveal">Proyek</div>
   <h2 class="section-title reveal">Proyek yang Telah Dikerjakan</h2>
@@ -960,7 +982,6 @@
       transition:color 0.2s, border-color 0.2s;
     " onmouseover="this.style.color='#00D4FF';this.style.borderColor='#00D4FF'"
        onmouseout="this.style.color='#8892A4';this.style.borderColor='rgba(0,212,255,0.15)'">✕</button>
-
     <div class="project-tags" style="margin-bottom:1rem;">
       <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
     </div>
@@ -970,28 +991,26 @@
     <p style="color:#8892A4;font-size:0.92rem;line-height:1.75;margin-bottom:1.5rem;">
       Platform absensi & pembelajaran untuk organisasi TKJ Nevtik — siswa mengisi absensi secara digital, pengajar membuat soal, dan siswa mengerjakan soal melalui fitur LMS, lengkap dengan dashboard ringkas di halaman beranda.
     </p>
-
     <a href="https://nevtiktkj.vercel.app" target="_blank" class="btn btn-primary" style="display:inline-flex;margin-bottom:2rem;">
       🔗 Kunjungi Website
     </a>
-
     <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:1rem">
       Dokumentasi
     </div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem;">
       <figure style="margin:0;">
-        <img src="Screenshot 2026-06-17 170359.png" alt="Beranda Nevtik TKJ Learning" style="width:100%;display:block;border-radius:12px;border:1px solid rgba(0,212,255,0.18);">
+        <img src="Screenshot 2026-06-17 170359.png" alt="Beranda" style="width:100%;display:block;border-radius:12px;border:1px solid rgba(0,212,255,0.18);">
         <figcaption style="font-size:0.8rem;color:#8892A4;margin-top:0.6rem;">Beranda — dashboard utama & quick actions</figcaption>
       </figure>
       <figure style="margin:0;">
-        <img src="Screenshot 2026-06-17 170504.png" alt="Form Absensi Nevtik TKJ Learning" style="width:100%;display:block;border-radius:12px;border:1px solid rgba(0,212,255,0.18);">
+        <img src="Screenshot 2026-06-17 170504.png" alt="Form Absensi" style="width:100%;display:block;border-radius:12px;border:1px solid rgba(0,212,255,0.18);">
         <figcaption style="font-size:0.8rem;color:#8892A4;margin-top:0.6rem;">Form Absensi & riwayat absensi terakhir</figcaption>
       </figure>
     </div>
   </div>
 </div>
 
-<!-- CONTACT -->
+<!-- ═══ CONTACT ═══ -->
 <section id="contact">
   <div class="section-label reveal">Kontak</div>
   <h2 class="section-title reveal" style="text-align:center">MARI BERKOLABORASI BERSAMA RAFI</h2>
@@ -1007,7 +1026,7 @@
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ═══ FOOTER ═══ -->
 <footer>
   <p>© 2026 <a href="#hero">Rafi Khairul Azzam</a> · Junior IT Engineer, Indonesia
     &nbsp;·&nbsp; <a href="#" onclick="openAdmin(event)" style="opacity:0.4;font-size:0.75rem">⚙ Admin</a>
@@ -1035,13 +1054,11 @@
       transition:color 0.2s, border-color 0.2s;
     " onmouseover="this.style.color='#00D4FF';this.style.borderColor='#00D4FF'"
        onmouseout="this.style.color='#8892A4';this.style.borderColor='rgba(0,212,255,0.15)'">✕</button>
-
     <div style="margin-bottom:1.8rem;">
       <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:0.4rem">Kirim Pesan</div>
       <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#F0F4FF;letter-spacing:-0.02em">Hubungi Rafi 📬</h3>
       <p style="color:#8892A4;font-size:0.88rem;margin-top:0.4rem">Pesan Anda akan langsung tersimpan dan saya baca secepatnya.</p>
     </div>
-
     <div style="display:flex;flex-direction:column;gap:1rem;">
       <div>
         <label style="font-size:0.8rem;color:#8892A4;font-weight:500;display:block;margin-bottom:0.4rem">Nama Lengkap *</label>
@@ -1079,9 +1096,7 @@
           outline:none; resize:vertical; transition:border-color 0.2s;
         " onfocus="this.style.borderColor='#00D4FF'" onblur="this.style.borderColor='rgba(0,212,255,0.15)'"></textarea>
       </div>
-
       <div id="fError" style="display:none;color:#FF6B6B;font-size:0.82rem;padding:0.5rem 0.8rem;background:rgba(255,107,107,0.1);border-radius:8px;border:1px solid rgba(255,107,107,0.2)"></div>
-
       <button onclick="submitForm()" id="submitBtn" style="
         background:#00D4FF; color:#0A0E1A; border:none;
         padding:0.9rem 1.8rem; border-radius:10px;
@@ -1093,7 +1108,6 @@
         Kirim Pesan →
       </button>
     </div>
-
     <div id="fSuccess" style="display:none;text-align:center;padding:1rem 0;">
       <div style="font-size:3rem;margin-bottom:1rem">✅</div>
       <h4 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:#F0F4FF;margin-bottom:0.5rem">Pesan Terkirim!</h4>
@@ -1101,8 +1115,7 @@
       <button onclick="closeEmailForm()" style="
         margin-top:1.5rem; background:transparent; border:1.5px solid rgba(0,212,255,0.3);
         color:#00D4FF; padding:0.65rem 1.5rem; border-radius:10px;
-        font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.9rem;
-        cursor:pointer;
+        font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer;
       ">Tutup</button>
     </div>
   </div>
@@ -1145,146 +1158,169 @@
 </div>
 
 <script>
-  /* ══════════════════════════════════════
-     WELCOME SCREEN DISMISS
-     ══════════════════════════════════════ */
+  /* ══════════════════════════════════════════
+     FORCE SCROLL TO TOP ON EVERY LOAD/REFRESH
+  ══════════════════════════════════════════ */
+  // Paksa browser scroll ke paling atas sebelum apapun dirender
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+  /* ══════════════════════════════════════════
+     HERO SCROLL LOCK SYSTEM
+  ══════════════════════════════════════════ */
+  let heroLocked = true;
+
+  // Kunci scroll body via CSS class, bukan style langsung
+  document.body.classList.add('scroll-locked');
+  document.documentElement.classList.add('scroll-locked');
+
+  /* Blokir wheel scroll */
+  function preventScroll(e) {
+    if (heroLocked) e.preventDefault();
+  }
+  /* Blokir touch scroll */
+  function preventTouchScroll(e) {
+    if (heroLocked) e.preventDefault();
+  }
+  /* Blokir keyboard scroll (arrow, space, pagedown, dll) */
+  const scrollKeys = {ArrowDown:1, ArrowUp:1, PageDown:1, PageUp:1, End:1, Home:1, ' ':1};
+  function preventKeyScroll(e) {
+    if (heroLocked && scrollKeys[e.key]) e.preventDefault();
+  }
+
+  window.addEventListener('wheel',      preventScroll,      { passive: false });
+  window.addEventListener('touchmove',  preventTouchScroll, { passive: false });
+  window.addEventListener('keydown',    preventKeyScroll);
+
+  /* Fungsi unlock scroll — dipanggil saat tombol diklik */
+  function unlockScroll() {
+    if (!heroLocked) return;
+    heroLocked = false;
+
+    // Hapus class lock, pastikan scroll aktif kembali
+    document.body.classList.remove('scroll-locked');
+    document.documentElement.classList.remove('scroll-locked');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+
+    window.removeEventListener('wheel',     preventScroll);
+    window.removeEventListener('touchmove', preventTouchScroll);
+    window.removeEventListener('keydown',   preventKeyScroll);
+
+    /* Sembunyikan scroll hint */
+    document.getElementById('heroScrollHint').classList.remove('visible');
+  }
+
+  /* Tombol "Jelajahi Portfolio" — unlock + transisi ke #about */
+  function explorePortfolio(e) {
+    e.preventDefault();
+    unlockScroll();
+    const transition = document.getElementById('pageTransition');
+    transition.classList.add('show');
+    setTimeout(() => {
+      window.scrollTo({ top: document.getElementById('about').offsetTop, behavior: 'instant' });
+      setTimeout(() => transition.classList.remove('show'), 150);
+    }, 450);
+  }
+
+  /* Tombol "Lihat Proyek" — unlock + scroll ke section target */
+  function unlockAndGo(e, target) {
+    e.preventDefault();
+    unlockScroll();
+    const transition = document.getElementById('pageTransition');
+    transition.classList.add('show');
+    setTimeout(() => {
+      window.scrollTo({ top: document.querySelector(target).offsetTop, behavior: 'instant' });
+      setTimeout(() => transition.classList.remove('show'), 150);
+    }, 450);
+  }
+
+  /* ══ WELCOME SCREEN ══ */
   window.addEventListener('load', () => {
+    // Paksa balik ke atas lagi setelah load selesai
+    window.scrollTo(0, 0);
+
     setTimeout(() => {
       const ws = document.getElementById('welcome-screen');
       ws.classList.add('fade-out');
-      setTimeout(() => ws.remove(), 900);
+      setTimeout(() => {
+        ws.remove();
+        // Pastikan masih di atas
+        window.scrollTo(0, 0);
+        /* Tampilkan scroll hint setelah welcome screen hilang */
+        setTimeout(() => {
+          document.getElementById('heroScrollHint').classList.add('visible');
+        }, 300);
+      }, 900);
     }, 3200);
   });
 
-  /* ══════════════════════════════════════════
-     PARTICLE CANVAS — floating stars + beams
-     ══════════════════════════════════════════ */
+  /* ══ PARTICLE CANVAS ══ */
   const canvas = document.getElementById('bg-canvas');
-  const ctx    = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   let W, H, particles, beams;
 
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   function makeParticle() {
-    return {
-      x:  Math.random() * W,
-      y:  Math.random() * H,
-      r:  Math.random() * 1.2 + 0.2,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      a:  Math.random(),
-      va: (Math.random() - 0.5) * 0.005,
-    };
+    return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.2+0.2,
+      vx: (Math.random()-0.5)*0.18, vy: (Math.random()-0.5)*0.18,
+      a: Math.random(), va: (Math.random()-0.5)*0.005 };
   }
-
   function makeBeam() {
-    return {
-      x:  Math.random() * W * 1.4 - W * 0.2,
-      y:  -60,
-      len: 80 + Math.random() * 180,
-      speed: 0.25 + Math.random() * 0.35,
-      a:  0,
-      maxA: 0.06 + Math.random() * 0.08,
-      phase: Math.random() * Math.PI * 2,
-    };
+    return { x: Math.random()*W*1.4-W*0.2, y: -60, len: 80+Math.random()*180,
+      speed: 0.25+Math.random()*0.35, a: 0, maxA: 0.06+Math.random()*0.08,
+      phase: Math.random()*Math.PI*2 };
   }
-
-  function init() {
-    resize();
-    particles = Array.from({ length: 140 }, makeParticle);
-    beams     = Array.from({ length: 8 },   makeBeam);
-  }
-
+  function init() { resize(); particles = Array.from({length:140}, makeParticle); beams = Array.from({length:8}, makeBeam); }
   function drawParticles() {
     particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.a += p.va;
-      if (p.a > 1) { p.a = 1; p.va *= -1; }
-      if (p.a < 0) { p.a = 0; p.va *= -1; }
-      if (p.x < -5) p.x = W + 5;
-      if (p.x > W + 5) p.x = -5;
-      if (p.y < -5) p.y = H + 5;
-      if (p.y > H + 5) p.y = -5;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0,212,255,${p.a * 0.55})`;
-      ctx.fill();
+      p.x+=p.vx; p.y+=p.vy; p.a+=p.va;
+      if(p.a>1){p.a=1;p.va*=-1;} if(p.a<0){p.a=0;p.va*=-1;}
+      if(p.x<-5)p.x=W+5; if(p.x>W+5)p.x=-5;
+      if(p.y<-5)p.y=H+5; if(p.y>H+5)p.y=-5;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${p.a*0.55})`; ctx.fill();
     });
   }
-
-  let tick = 0;
+  let tick=0;
   function drawBeams() {
     beams.forEach(b => {
-      b.y += b.speed;
-      b.a  = b.maxA * Math.sin(tick * 0.008 + b.phase);
-      if (b.y > H + 100) {
-        b.y = -80;
-        b.x = Math.random() * W * 1.4 - W * 0.2;
-        b.len = 80 + Math.random() * 180;
-      }
-      const x1 = b.x, y1 = b.y;
-      const x2 = b.x + b.len * 0.55, y2 = b.y + b.len;
-      const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-      grad.addColorStop(0,   `rgba(0,212,255,0)`);
-      grad.addColorStop(0.4, `rgba(0,212,255,${b.a})`);
-      grad.addColorStop(1,   `rgba(0,212,255,0)`);
-      ctx.save();
-      ctx.strokeStyle = grad;
-      ctx.lineWidth   = 1.2;
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.restore();
+      b.y+=b.speed; b.a=b.maxA*Math.sin(tick*0.008+b.phase);
+      if(b.y>H+100){ b.y=-80; b.x=Math.random()*W*1.4-W*0.2; b.len=80+Math.random()*180; }
+      const x1=b.x,y1=b.y,x2=b.x+b.len*0.55,y2=b.y+b.len;
+      const grad=ctx.createLinearGradient(x1,y1,x2,y2);
+      grad.addColorStop(0,`rgba(0,212,255,0)`);
+      grad.addColorStop(0.4,`rgba(0,212,255,${b.a})`);
+      grad.addColorStop(1,`rgba(0,212,255,0)`);
+      ctx.save(); ctx.strokeStyle=grad; ctx.lineWidth=1.2; ctx.globalAlpha=1;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
     });
   }
-
   function drawHorizon() {
-    const grad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
-    grad.addColorStop(0,   'rgba(0,212,255,0.04)');
-    grad.addColorStop(0.4, 'rgba(0,212,255,0.01)');
-    grad.addColorStop(1,   'transparent');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H * 0.55);
+    const grad=ctx.createLinearGradient(0,0,0,H*0.55);
+    grad.addColorStop(0,'rgba(0,212,255,0.04)');
+    grad.addColorStop(0.4,'rgba(0,212,255,0.01)');
+    grad.addColorStop(1,'transparent');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H*0.55);
   }
+  function loop() { tick++; ctx.clearRect(0,0,W,H); drawHorizon(); drawBeams(); drawParticles(); requestAnimationFrame(loop); }
+  window.addEventListener('resize', resize);
+  init(); loop();
 
-  function loop() {
-    tick++;
-    ctx.clearRect(0, 0, W, H);
-    drawHorizon();
-    drawBeams();
-    drawParticles();
-    requestAnimationFrame(loop);
-  }
-
-  window.addEventListener('resize', () => { resize(); });
-  init();
-  loop();
-
-  /* ══════════════════════════════
-     CURSOR GLOW
-     ══════════════════════════════ */
+  /* ══ CURSOR GLOW ══ */
   const glow = document.getElementById('cursorGlow');
-  document.addEventListener('mousemove', e => {
-    glow.style.left = e.clientX + 'px';
-    glow.style.top  = e.clientY + 'px';
-  });
+  document.addEventListener('mousemove', e => { glow.style.left=e.clientX+'px'; glow.style.top=e.clientY+'px'; });
 
-  /* ══════════════════════════════
-     NAVBAR SCROLL
-     ══════════════════════════════ */
+  /* ══ NAVBAR SCROLL ══ */
   const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-  });
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 50));
 
-  /* ══════════════════════════════
-     HAMBURGER
-     ══════════════════════════════ */
-  const ham  = document.getElementById('hamburger');
+  /* ══ HAMBURGER ══ */
+  const ham = document.getElementById('hamburger');
   const menu = document.getElementById('mobileMenu');
   ham.addEventListener('click', () => {
     ham.classList.toggle('open');
@@ -1293,123 +1329,268 @@
   });
   document.querySelectorAll('.mob-link').forEach(link => {
     link.addEventListener('click', () => {
+      unlockScroll();
       ham.classList.remove('open');
       menu.classList.remove('open');
       document.body.style.overflow = '';
     });
   });
 
-  /* ══════════════════════════════
-     TYPING EFFECT
-     ══════════════════════════════ */
+  /* ══ TYPING EFFECT ══ */
   const phrases = ['Devops Engineer','Network Engineer','IT Support Specialist','Problem Solver','Freelancer'];
-  let pIdx = 0, cIdx = 0, deleting = false;
+  let pIdx=0, cIdx=0, deleting=false;
   const el = document.getElementById('typingText');
   function type() {
     const cur = phrases[pIdx];
-    el.textContent = deleting ? cur.slice(0, cIdx--) : cur.slice(0, cIdx++);
+    el.textContent = deleting ? cur.slice(0,cIdx--) : cur.slice(0,cIdx++);
     let delay = deleting ? 60 : 110;
-    if (!deleting && cIdx > cur.length) { delay = 1800; deleting = true; }
-    if (deleting && cIdx < 0) { deleting = false; pIdx = (pIdx+1) % phrases.length; delay = 500; }
+    if(!deleting && cIdx>cur.length){ delay=1800; deleting=true; }
+    if(deleting && cIdx<0){ deleting=false; pIdx=(pIdx+1)%phrases.length; delay=500; }
     setTimeout(type, delay);
   }
   type();
 
-  /* ══════════════════════════════
-     REVEAL ON SCROLL
-     ══════════════════════════════ */
+  /* ══ REVEAL ON SCROLL ══ */
   const revealEls = document.querySelectorAll('.reveal');
-  const observer  = new IntersectionObserver(entries => {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
+      if(e.isIntersecting){
         e.target.classList.add('visible');
         const bar = e.target.querySelector('.skill-bar');
-        if (bar) setTimeout(() => bar.classList.add('animated'), 300);
+        if(bar) setTimeout(() => bar.classList.add('animated'), 300);
       }
     });
   }, { threshold: 0.12 });
   revealEls.forEach(el => observer.observe(el));
 
-  /* ══════════════════════════════
-     SERTIFIKAT SLIDER (geser kiri/kanan)
-     ══════════════════════════════ */
+  /* ══ CERT SLIDER ══ */
   document.querySelectorAll('.cert-slider').forEach(slider => {
     const track = slider.querySelector('.cert-slides');
-    const slides = Array.from(track.children);
     const dots = Array.from(slider.querySelectorAll('.cert-dot'));
     const btnL = slider.querySelector('.cert-arrow-left');
     const btnR = slider.querySelector('.cert-arrow-right');
-    const total = slides.length;
+    const total = track.children.length;
     let index = 0;
-
     function go(i) {
-      index = Math.max(0, Math.min(total - 1, i));
-      track.style.transform = `translateX(-${index * 100}%)`;
-      dots.forEach((d, di) => d.classList.toggle('active', di === index));
-      if (btnL) btnL.style.visibility = index === 0 ? 'hidden' : 'visible';
-      if (btnR) btnR.style.visibility = index === total - 1 ? 'hidden' : 'visible';
+      index = Math.max(0, Math.min(total-1, i));
+      track.style.transform = `translateX(-${index*100}%)`;
+      dots.forEach((d,di) => d.classList.toggle('active', di===index));
+      if(btnL) btnL.style.visibility = index===0 ? 'hidden' : 'visible';
+      if(btnR) btnR.style.visibility = index===total-1 ? 'hidden' : 'visible';
     }
-
-    btnR && btnR.addEventListener('click', () => go(index + 1));
-    btnL && btnL.addEventListener('click', () => go(index - 1));
-    dots.forEach((d, di) => d.addEventListener('click', () => go(di)));
-
-    let startX = 0, deltaX = 0, dragging = false;
-
-    function dragStart(x) {
-      dragging = true;
-      startX = x;
-      track.style.transition = 'none';
-      slider.classList.add('dragging');
-    }
-    function dragMove(x) {
-      if (!dragging) return;
-      deltaX = x - startX;
-      track.style.transform = `translateX(${-(index * 100) + (deltaX / slider.clientWidth) * 100}%)`;
-    }
-    function dragEnd() {
-      if (!dragging) return;
-      dragging = false;
-      slider.classList.remove('dragging');
-      track.style.transition = '';
-      if (Math.abs(deltaX) > slider.clientWidth * 0.18) {
-        go(deltaX < 0 ? index + 1 : index - 1);
-      } else {
-        go(index);
-      }
-      deltaX = 0;
-    }
-
-    slider.addEventListener('touchstart', e => dragStart(e.touches[0].clientX), { passive: true });
-    slider.addEventListener('touchmove',  e => dragMove(e.touches[0].clientX),  { passive: true });
+    btnR && btnR.addEventListener('click', () => go(index+1));
+    btnL && btnL.addEventListener('click', () => go(index-1));
+    dots.forEach((d,di) => d.addEventListener('click', () => go(di)));
+    let startX=0, deltaX=0, dragging=false;
+    function dragStart(x){ dragging=true; startX=x; track.style.transition='none'; slider.classList.add('dragging'); }
+    function dragMove(x){ if(!dragging)return; deltaX=x-startX; track.style.transform=`translateX(${-(index*100)+(deltaX/slider.clientWidth)*100}%)`; }
+    function dragEnd(){ if(!dragging)return; dragging=false; slider.classList.remove('dragging'); track.style.transition=''; if(Math.abs(deltaX)>slider.clientWidth*0.18){ go(deltaX<0?index+1:index-1); }else{ go(index); } deltaX=0; }
+    slider.addEventListener('touchstart', e=>dragStart(e.touches[0].clientX), {passive:true});
+    slider.addEventListener('touchmove',  e=>dragMove(e.touches[0].clientX),  {passive:true});
     slider.addEventListener('touchend', dragEnd);
-
-    slider.addEventListener('mousedown', e => { dragStart(e.clientX); e.preventDefault(); });
-    window.addEventListener('mousemove', e => dragMove(e.clientX));
+    slider.addEventListener('mousedown', e=>{ dragStart(e.clientX); e.preventDefault(); });
+    window.addEventListener('mousemove', e=>dragMove(e.clientX));
     window.addEventListener('mouseup', dragEnd);
-
     go(0);
   });
 
-  /* ══════════════════════════════
-     SKILL BAR WIDTHS
-     ══════════════════════════════ */
-  document.querySelectorAll('.skill-bar').forEach(bar => {
-    bar.style.width = bar.dataset.width || '80%';
+  /* ══ SKILL BAR WIDTHS ══ */
+  document.querySelectorAll('.skill-bar').forEach(bar => { bar.style.width = bar.dataset.width || '80%'; });
+
+  /* ══ EMAIL FORM ══ */
+  function openEmailForm(e) {
+    e.preventDefault();
+    const overlay = document.getElementById('emailOverlay');
+    const modal   = document.getElementById('emailModal');
+    overlay.style.display = 'flex';
+    setTimeout(() => { modal.style.opacity='1'; modal.style.transform='translateY(0) scale(1)'; }, 20);
+    document.body.style.overflow = 'hidden';
+    document.getElementById('fSuccess').style.display = 'none';
+    document.querySelector('#emailModal > div:nth-child(3)').style.display = 'flex';
+    document.getElementById('fError').style.display = 'none';
+  }
+  function closeEmailForm() {
+    const overlay = document.getElementById('emailOverlay');
+    const modal   = document.getElementById('emailModal');
+    modal.style.opacity='0'; modal.style.transform='translateY(30px) scale(0.97)';
+    setTimeout(() => { overlay.style.display='none'; }, 380);
+    document.body.style.overflow = '';
+  }
+  function submitForm() {
+    const name    = document.getElementById('fName').value.trim();
+    const email   = document.getElementById('fEmail').value.trim();
+    const subject = document.getElementById('fSubject').value.trim();
+    const message = document.getElementById('fMessage').value.trim();
+    const errEl   = document.getElementById('fError');
+    if(!name||!email||!subject||!message){ errEl.textContent='⚠ Semua field wajib diisi!'; errEl.style.display='block'; return; }
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRe.test(email)){ errEl.textContent='⚠ Format email tidak valid!'; errEl.style.display='block'; return; }
+    errEl.style.display='none';
+    const btn = document.getElementById('submitBtn');
+    btn.textContent='Menyimpan...'; btn.disabled=true;
+    dbInsert({name,email,subject,message}, () => {
+      document.querySelector('#emailModal > div:nth-child(3)').style.display='none';
+      document.getElementById('fSuccess').style.display='block';
+      ['fName','fEmail','fSubject','fMessage'].forEach(id => document.getElementById(id).value='');
+      btn.textContent='Kirim Pesan →'; btn.disabled=false;
+    });
+  }
+  document.getElementById('emailOverlay').addEventListener('click', function(e){ if(e.target===this) closeEmailForm(); });
+
+  /* ══ PROJECT MODAL ══ */
+  function openProjectModal(e) {
+    if(e) e.preventDefault();
+    const overlay = document.getElementById('projectOverlay');
+    const modal   = document.getElementById('projectModal');
+    overlay.style.display='flex';
+    setTimeout(() => { modal.style.opacity='1'; modal.style.transform='translateY(0) scale(1)'; }, 20);
+    document.body.style.overflow='hidden';
+  }
+  function closeProjectModal() {
+    const overlay = document.getElementById('projectOverlay');
+    const modal   = document.getElementById('projectModal');
+    modal.style.opacity='0'; modal.style.transform='translateY(30px) scale(0.97)';
+    setTimeout(() => { overlay.style.display='none'; }, 380);
+    document.body.style.overflow='';
+  }
+  document.getElementById('projectOverlay').addEventListener('click', function(e){ if(e.target===this) closeProjectModal(); });
+
+  /* ══ ADMIN PANEL ══ */
+  const ADMIN_PASS = 'adminrafi123';
+  let adminUnlocked = false;
+
+  function openAdmin(e) {
+    e.preventDefault();
+    if(!adminUnlocked){ showPasswordModal(); } else { showAdminPanel(); }
+  }
+  function showPasswordModal() {
+    const overlay = document.getElementById('adminOverlay');
+    overlay.style.display='flex'; document.body.style.overflow='hidden';
+    overlay.innerHTML=`
+      <div style="background:#151C2E;border:1px solid rgba(0,212,255,0.2);border-radius:20px;padding:2.5rem;width:min(400px,90vw);text-align:center;position:relative;">
+        <button onclick="closeAdmin()" style="position:absolute;top:1.2rem;right:1.2rem;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.15);color:#8892A4;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1.1rem;">✕</button>
+        <div style="font-size:2.5rem;margin-bottom:1rem">🔐</div>
+        <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:0.4rem">Admin Area</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:#F0F4FF;margin-bottom:0.5rem">Masukkan Password</h3>
+        <p style="font-size:0.85rem;color:#8892A4;margin-bottom:1.5rem">Area ini hanya untuk Rafi.</p>
+        <div style="position:relative;margin-bottom:0.8rem;">
+          <input id="passInput" type="password" placeholder="Password admin..."
+            style="width:100%;padding:0.8rem 3rem 0.8rem 1rem;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:10px;color:#F0F4FF;font-size:0.95rem;font-family:'Inter',sans-serif;outline:none;text-align:center;letter-spacing:0.1em;"
+            onfocus="this.style.borderColor='#00D4FF'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'"
+            onkeydown="if(event.key==='Enter')checkPassword()">
+          <button onclick="togglePassVis()" id="passToggle" style="position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#8892A4;cursor:pointer;font-size:1rem;">👁</button>
+        </div>
+        <div id="passError" style="display:none;color:#FF6B6B;font-size:0.82rem;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);border-radius:8px;padding:0.45rem 0.8rem;margin-bottom:0.8rem;">❌ Password salah, coba lagi!</div>
+        <button onclick="checkPassword()" style="width:100%;background:#00D4FF;color:#0A0E1A;border:none;padding:0.85rem;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 0 20px rgba(0,212,255,0.3);">Masuk →</button>
+      </div>`;
+    setTimeout(() => document.getElementById('passInput').focus(), 100);
+  }
+  function togglePassVis() { const inp=document.getElementById('passInput'); inp.type=inp.type==='password'?'text':'password'; }
+  function checkPassword() {
+    const val=document.getElementById('passInput').value;
+    const errEl=document.getElementById('passError');
+    if(val===ADMIN_PASS){
+      adminUnlocked=true; errEl.style.display='none';
+      document.getElementById('passInput').style.borderColor='#00D4FF';
+      setTimeout(() => { document.getElementById('adminOverlay').innerHTML=''; rebuildAdminPanel(); showAdminPanel(); }, 200);
+    } else {
+      errEl.style.display='block';
+      document.getElementById('passInput').style.borderColor='#FF6B6B';
+      document.getElementById('passInput').value='';
+      setTimeout(() => document.getElementById('passInput').style.borderColor='rgba(0,212,255,0.2)', 800);
+    }
+  }
+  function rebuildAdminPanel() {
+    document.getElementById('adminOverlay').innerHTML=`
+      <div id="adminPanel" style="background:#151C2E;border:1px solid rgba(0,212,255,0.2);border-radius:20px;padding:2.5rem;width:min(720px,94vw);margin-bottom:3rem;position:relative;">
+        <button onclick="closeAdmin()" style="position:absolute;top:1.2rem;right:1.2rem;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.15);color:#8892A4;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:0.3rem">
+          <div>
+            <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:0.3rem">Dashboard</div>
+            <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#F0F4FF">📥 Inbox Pesan Masuk</h3>
+          </div>
+          <div style="font-size:0.75rem;padding:0.3rem 0.8rem;border-radius:99px;background:${firebaseOK?'rgba(0,255,136,0.1)':'rgba(255,209,102,0.1)'};border:1px solid ${firebaseOK?'rgba(0,255,136,0.3)':'rgba(255,209,102,0.3)'};color:${firebaseOK?'#00FF88':'#FFD166'}">
+            ${firebaseOK?'🟢 Firebase Real-time':'🟡 Mode Lokal (setup Firebase)'}
+          </div>
+        </div>
+        <div id="adminStats" style="display:flex;gap:1.5rem;margin:1.2rem 0 1.5rem;flex-wrap:wrap;"></div>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <button onclick="logoutAdmin()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#8892A4;padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🔒 Logout</button>
+          <button onclick="clearAll()" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:#FF6B6B;padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🗑 Hapus Semua</button>
+          <button onclick="exportMessages()" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:#00D4FF;padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">⬇ Export JSON</button>
+        </div>
+        <div id="adminMsgList"></div>
+      </div>`;
+  }
+  function showAdminPanel() {
+    const overlay=document.getElementById('adminOverlay');
+    overlay.style.display='flex'; document.body.style.overflow='hidden';
+    renderAdmin();
+    if(firebaseOK) db.ref('messages').on('value', () => renderAdmin());
+  }
+  function logoutAdmin() { adminUnlocked=false; if(firebaseOK) db.ref('messages').off(); closeAdmin(); }
+  function closeAdmin() { document.getElementById('adminOverlay').style.display='none'; document.body.style.overflow=''; }
+  document.getElementById('adminOverlay').addEventListener('click', function(e){ if(e.target===this) closeAdmin(); });
+
+  function renderAdmin() {
+    dbGetAll(msgs => {
+      const unread=msgs.filter(m=>!m.read).length;
+      const statsEl=document.getElementById('adminStats');
+      const listEl=document.getElementById('adminMsgList');
+      if(!statsEl||!listEl) return;
+      statsEl.innerHTML=`
+        <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18);border-radius:10px;padding:0.65rem 1.2rem;text-align:center;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#00D4FF">${msgs.length}</div>
+          <div style="font-size:0.75rem;color:#8892A4">Total Pesan</div>
+        </div>
+        <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.18);border-radius:10px;padding:0.65rem 1.2rem;text-align:center;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#FFD166">${unread}</div>
+          <div style="font-size:0.75rem;color:#8892A4">Belum Dibaca</div>
+        </div>`;
+      if(msgs.length===0){ listEl.innerHTML=`<div style="text-align:center;padding:3rem;color:#8892A4;"><div style="font-size:2.5rem;margin-bottom:1rem">📭</div><p>Belum ada pesan masuk.</p></div>`; return; }
+      listEl.innerHTML=msgs.map(m => {
+        const dateStr=new Date(m.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+        return `<div id="msg-${m.id}" style="background:${m.read?'rgba(255,255,255,0.02)':'rgba(0,212,255,0.05)'};border:1px solid ${m.read?'rgba(0,212,255,0.1)':'rgba(0,212,255,0.25)'};border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:0.9rem;transition:opacity 0.3s;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.6rem;">
+            <div>
+              <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#F0F4FF;font-size:0.97rem">${escHtml(m.name)}</span>
+              ${!m.read?'<span style="background:#00D4FF;color:#0A0E1A;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle">BARU</span>':''}
+              <div style="font-size:0.8rem;color:#8892A4;margin-top:2px">${escHtml(m.email)}</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0">
+              <span style="font-size:0.75rem;color:#8892A4">${dateStr}</span>
+              ${!m.read?`<button onclick="markRead('${m.id}')" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:#00D4FF;padding:3px 8px;border-radius:6px;font-size:0.72rem;cursor:pointer">✓ Baca</button>`:''}
+              <button onclick="deleteMsg('${m.id}')" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);color:#FF6B6B;padding:3px 8px;border-radius:6px;font-size:0.72rem;cursor:pointer">✕</button>
+            </div>
+          </div>
+          <div style="font-size:0.85rem;font-weight:600;color:#00D4FF;margin-bottom:0.35rem">📌 ${escHtml(m.subject)}</div>
+          <div style="font-size:0.87rem;color:#8892A4;line-height:1.65;white-space:pre-wrap">${escHtml(m.message)}</div>
+        </div>`;
+      }).join('');
+    });
+  }
+  function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function markRead(id){ dbMarkRead(id); }
+  function deleteMsg(id){ const el=document.getElementById('msg-'+id); if(el){el.style.opacity='0';setTimeout(()=>dbDelete(id),280);}else dbDelete(id); }
+  function clearAll(){ if(confirm('Hapus semua pesan? Aksi ini tidak bisa dibatalkan.')) dbClear(); }
+  function exportMessages(){
+    dbGetAll(msgs=>{
+      const blob=new Blob([JSON.stringify(msgs,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download='pesan_rafi_'+Date.now()+'.json';
+      a.click(); URL.revokeObjectURL(url);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if(e.key==='Escape'){ closeEmailForm(); closeAdmin(); closeProjectModal(); }
   });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════
-   FIREBASE CONFIG
-   1. Buka https://console.firebase.google.com
-   2. Buat project baru → tambah Web App
-   3. Copy firebaseConfig dari sana, ganti bagian di bawah
-   4. Di Firebase Console → Realtime Database → Rules:
-      { "rules": { ".read": false, ".write": true } }
-   ═══════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
   apiKey:            "GANTI_DENGAN_API_KEY_ANDA",
   authDomain:        "GANTI.firebaseapp.com",
@@ -1419,422 +1600,27 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "GANTI",
   appId:             "GANTI"
 };
-
-let db = null;
-let firebaseOK = false;
-
+let db = null, firebaseOK = false;
 try {
-  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
   firebaseOK = !FIREBASE_CONFIG.apiKey.includes('GANTI');
-} catch(e) { firebaseOK = false; }
+} catch(e){ firebaseOK=false; }
 
 const DB_KEY = 'rafi_messages';
+function lsGet(){ try{ return JSON.parse(localStorage.getItem(DB_KEY)||'[]'); }catch(e){ return []; } }
+function lsSave(data){ localStorage.setItem(DB_KEY, JSON.stringify(data)); }
 
-function lsGet() {
-  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch(e) { return []; }
+function dbInsert(msg, callback){
+  const entry={...msg, read:false, date:new Date().toISOString()};
+  if(firebaseOK){
+    db.ref('messages').push(entry).then(()=>callback&&callback(true)).catch(()=>{ const all=lsGet(); all.unshift({id:Date.now(),...entry}); lsSave(all); callback&&callback(true); });
+  } else { const all=lsGet(); all.unshift({id:Date.now(),...entry}); lsSave(all); callback&&callback(true); }
 }
-function lsSave(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
-
-function dbInsert(msg, callback) {
-  const entry = { ...msg, read: false, date: new Date().toISOString() };
-  if (firebaseOK) {
-    db.ref('messages').push(entry)
-      .then(() => callback && callback(true))
-      .catch(() => {
-        const all = lsGet();
-        all.unshift({ id: Date.now(), ...entry });
-        lsSave(all); callback && callback(true);
-      });
-  } else {
-    const all = lsGet();
-    all.unshift({ id: Date.now(), ...entry });
-    lsSave(all); callback && callback(true);
-  }
-}
-
-function dbDelete(id) {
-  if (firebaseOK) {
-    db.ref('messages/' + id).remove().then(renderAdmin);
-  } else {
-    lsSave(lsGet().filter(m => String(m.id) !== String(id)));
-    renderAdmin();
-  }
-}
-
-function dbMarkRead(id) {
-  if (firebaseOK) {
-    db.ref('messages/' + id + '/read').set(true).then(renderAdmin);
-  } else {
-    const all = lsGet();
-    const m = all.find(x => String(x.id) === String(id));
-    if (m) { m.read = true; lsSave(all); }
-    renderAdmin();
-  }
-}
-
-function dbClear(callback) {
-  if (firebaseOK) {
-    db.ref('messages').remove().then(() => { renderAdmin(); callback && callback(); });
-  } else {
-    localStorage.removeItem(DB_KEY); renderAdmin(); callback && callback();
-  }
-}
-
-function dbGetAll(callback) {
-  if (firebaseOK) {
-    db.ref('messages').orderByChild('date').once('value', snap => {
-      const msgs = [];
-      snap.forEach(child => msgs.unshift({ id: child.key, ...child.val() }));
-      callback(msgs);
-    });
-  } else {
-    callback(lsGet());
-  }
-}
-
-/* ═══ EMAIL FORM ═══ */
-function openEmailForm(e) {
-  e.preventDefault();
-  const overlay = document.getElementById('emailOverlay');
-  const modal   = document.getElementById('emailModal');
-  overlay.style.display = 'flex';
-  setTimeout(() => {
-    modal.style.opacity   = '1';
-    modal.style.transform = 'translateY(0) scale(1)';
-  }, 20);
-  document.body.style.overflow = 'hidden';
-  document.getElementById('fSuccess').style.display = 'none';
-  document.querySelector('#emailModal > div:nth-child(3)').style.display = 'flex';
-  document.getElementById('fError').style.display = 'none';
-}
-
-function closeEmailForm() {
-  const overlay = document.getElementById('emailOverlay');
-  const modal   = document.getElementById('emailModal');
-  modal.style.opacity   = '0';
-  modal.style.transform = 'translateY(30px) scale(0.97)';
-  setTimeout(() => { overlay.style.display = 'none'; }, 380);
-  document.body.style.overflow = '';
-}
-
-function submitForm() {
-  const name    = document.getElementById('fName').value.trim();
-  const email   = document.getElementById('fEmail').value.trim();
-  const subject = document.getElementById('fSubject').value.trim();
-  const message = document.getElementById('fMessage').value.trim();
-  const errEl   = document.getElementById('fError');
-
-  if (!name || !email || !subject || !message) {
-    errEl.textContent = '⚠ Semua field wajib diisi!';
-    errEl.style.display = 'block'; return;
-  }
-  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRe.test(email)) {
-    errEl.textContent = '⚠ Format email tidak valid!';
-    errEl.style.display = 'block'; return;
-  }
-  errEl.style.display = 'none';
-
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Menyimpan...';
-  btn.disabled = true;
-
-  dbInsert({ name, email, subject, message }, () => {
-    document.querySelector('#emailModal > div:nth-child(3)').style.display = 'none';
-    document.getElementById('fSuccess').style.display = 'block';
-    ['fName','fEmail','fSubject','fMessage'].forEach(id => document.getElementById(id).value = '');
-    btn.textContent = 'Kirim Pesan →';
-    btn.disabled = false;
-  });
-}
-
-document.getElementById('emailOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeEmailForm();
-});
-
-/* ═══ PROJECT MODAL ═══ */
-function openProjectModal(e) {
-  if (e) e.preventDefault();
-  const overlay = document.getElementById('projectOverlay');
-  const modal   = document.getElementById('projectModal');
-  overlay.style.display = 'flex';
-  setTimeout(() => {
-    modal.style.opacity   = '1';
-    modal.style.transform = 'translateY(0) scale(1)';
-  }, 20);
-  document.body.style.overflow = 'hidden';
-}
-
-function closeProjectModal() {
-  const overlay = document.getElementById('projectOverlay');
-  const modal   = document.getElementById('projectModal');
-  modal.style.opacity   = '0';
-  modal.style.transform = 'translateY(30px) scale(0.97)';
-  setTimeout(() => { overlay.style.display = 'none'; }, 380);
-  document.body.style.overflow = '';
-}
-
-document.getElementById('projectOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeProjectModal();
-});
-
-/* ═══ ADMIN PANEL ═══ */
-const ADMIN_PASS = 'adminrafi123';
-let adminUnlocked = false;
-
-function openAdmin(e) {
-  e.preventDefault();
-  if (!adminUnlocked) {
-    showPasswordModal();
-  } else {
-    showAdminPanel();
-  }
-}
-
-function showPasswordModal() {
-  const overlay = document.getElementById('adminOverlay');
-  overlay.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  overlay.innerHTML = `
-    <div style="
-      background:#151C2E; border:1px solid rgba(0,212,255,0.2);
-      border-radius:20px; padding:2.5rem; width:min(400px,90vw);
-      text-align:center; position:relative;
-    ">
-      <button onclick="closeAdmin()" style="
-        position:absolute; top:1.2rem; right:1.2rem;
-        background:rgba(255,255,255,0.05); border:1px solid rgba(0,212,255,0.15);
-        color:#8892A4; border-radius:8px; width:32px; height:32px;
-        cursor:pointer; font-size:1.1rem;
-      ">✕</button>
-      <div style="font-size:2.5rem;margin-bottom:1rem">🔐</div>
-      <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:0.4rem">Admin Area</div>
-      <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:#F0F4FF;margin-bottom:0.5rem">Masukkan Password</h3>
-      <p style="font-size:0.85rem;color:#8892A4;margin-bottom:1.5rem">Area ini hanya untuk Rafi.</p>
-      <div style="position:relative;margin-bottom:0.8rem;">
-        <input id="passInput" type="password" placeholder="Password admin..."
-          style="
-            width:100%; padding:0.8rem 3rem 0.8rem 1rem;
-            background:rgba(255,255,255,0.04);
-            border:1px solid rgba(0,212,255,0.2); border-radius:10px;
-            color:#F0F4FF; font-size:0.95rem; font-family:'Inter',sans-serif;
-            outline:none; text-align:center; letter-spacing:0.1em;
-          "
-          onfocus="this.style.borderColor='#00D4FF'"
-          onblur="this.style.borderColor='rgba(0,212,255,0.2)'"
-          onkeydown="if(event.key==='Enter')checkPassword()"
-        >
-        <button onclick="togglePassVis()" id="passToggle" style="
-          position:absolute; right:0.8rem; top:50%; transform:translateY(-50%);
-          background:none; border:none; color:#8892A4; cursor:pointer; font-size:1rem;
-        ">👁</button>
-      </div>
-      <div id="passError" style="display:none;color:#FF6B6B;font-size:0.82rem;
-        background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);
-        border-radius:8px;padding:0.45rem 0.8rem;margin-bottom:0.8rem;">
-        ❌ Password salah, coba lagi!
-      </div>
-      <button onclick="checkPassword()" style="
-        width:100%; background:#00D4FF; color:#0A0E1A; border:none;
-        padding:0.85rem; border-radius:10px;
-        font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:0.95rem;
-        cursor:pointer; box-shadow:0 0 20px rgba(0,212,255,0.3);
-        transition:transform 0.2s;
-      " onmouseover="this.style.transform='translateY(-2px)'"
-         onmouseout="this.style.transform=''">
-        Masuk →
-      </button>
-    </div>
-  `;
-  setTimeout(() => document.getElementById('passInput').focus(), 100);
-}
-
-function togglePassVis() {
-  const inp = document.getElementById('passInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function checkPassword() {
-  const val = document.getElementById('passInput').value;
-  const errEl = document.getElementById('passError');
-  if (val === ADMIN_PASS) {
-    adminUnlocked = true;
-    errEl.style.display = 'none';
-    document.getElementById('passInput').style.borderColor = '#00D4FF';
-    setTimeout(() => {
-      document.getElementById('adminOverlay').innerHTML = '';
-      rebuildAdminPanel();
-      showAdminPanel();
-    }, 200);
-  } else {
-    errEl.style.display = 'block';
-    document.getElementById('passInput').style.borderColor = '#FF6B6B';
-    document.getElementById('passInput').value = '';
-    setTimeout(() => document.getElementById('passInput').style.borderColor = 'rgba(0,212,255,0.2)', 800);
-  }
-}
-
-function rebuildAdminPanel() {
-  const overlay = document.getElementById('adminOverlay');
-  overlay.innerHTML = `
-    <div id="adminPanel" style="
-      background:#151C2E; border:1px solid rgba(0,212,255,0.2);
-      border-radius:20px; padding:2.5rem; width:min(720px,94vw);
-      margin-bottom:3rem; position:relative;
-    ">
-      <button onclick="closeAdmin()" style="
-        position:absolute; top:1.2rem; right:1.2rem;
-        background:rgba(255,255,255,0.05); border:1px solid rgba(0,212,255,0.15);
-        color:#8892A4; border-radius:8px; width:32px; height:32px;
-        cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;
-      ">✕</button>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:0.3rem">
-        <div>
-          <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#00D4FF;margin-bottom:0.3rem">Dashboard</div>
-          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#F0F4FF">📥 Inbox Pesan Masuk</h3>
-        </div>
-        <div style="font-size:0.75rem;padding:0.3rem 0.8rem;border-radius:99px;
-          background:${firebaseOK ? 'rgba(0,255,136,0.1)' : 'rgba(255,209,102,0.1)'};
-          border:1px solid ${firebaseOK ? 'rgba(0,255,136,0.3)' : 'rgba(255,209,102,0.3)'};
-          color:${firebaseOK ? '#00FF88' : '#FFD166'}">
-          ${firebaseOK ? '🟢 Firebase Real-time' : '🟡 Mode Lokal (setup Firebase)'}
-        </div>
-      </div>
-      <div id="adminStats" style="display:flex;gap:1.5rem;margin:1.2rem 0 1.5rem;flex-wrap:wrap;"></div>
-      <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;">
-        <button onclick="logoutAdmin()" style="
-          background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
-          color:#8892A4; padding:0.55rem 1.1rem; border-radius:8px;
-          font-size:0.82rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">
-          🔒 Logout
-        </button>
-        <button onclick="clearAll()" style="
-          background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3);
-          color:#FF6B6B; padding:0.55rem 1.1rem; border-radius:8px;
-          font-size:0.82rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">
-          🗑 Hapus Semua
-        </button>
-        <button onclick="exportMessages()" style="
-          background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
-          color:#00D4FF; padding:0.55rem 1.1rem; border-radius:8px;
-          font-size:0.82rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">
-          ⬇ Export JSON
-        </button>
-      </div>
-      <div id="adminMsgList"></div>
-    </div>
-  `;
-}
-
-function showAdminPanel() {
-  const overlay = document.getElementById('adminOverlay');
-  overlay.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  renderAdmin();
-  if (firebaseOK) {
-    db.ref('messages').on('value', () => renderAdmin());
-  }
-}
-
-function logoutAdmin() {
-  adminUnlocked = false;
-  if (firebaseOK) db.ref('messages').off();
-  closeAdmin();
-}
-
-function closeAdmin() {
-  const overlay = document.getElementById('adminOverlay');
-  overlay.style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-document.getElementById('adminOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeAdmin();
-});
-
-function renderAdmin() {
-  dbGetAll(msgs => {
-    const unread = msgs.filter(m => !m.read).length;
-    const statsEl = document.getElementById('adminStats');
-    const listEl  = document.getElementById('adminMsgList');
-    if (!statsEl || !listEl) return;
-
-    statsEl.innerHTML = `
-      <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18);border-radius:10px;padding:0.65rem 1.2rem;text-align:center;">
-        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#00D4FF">${msgs.length}</div>
-        <div style="font-size:0.75rem;color:#8892A4">Total Pesan</div>
-      </div>
-      <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.18);border-radius:10px;padding:0.65rem 1.2rem;text-align:center;">
-        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#FFD166">${unread}</div>
-        <div style="font-size:0.75rem;color:#8892A4">Belum Dibaca</div>
-      </div>
-    `;
-
-    if (msgs.length === 0) {
-      listEl.innerHTML = `<div style="text-align:center;padding:3rem;color:#8892A4;">
-        <div style="font-size:2.5rem;margin-bottom:1rem">📭</div>
-        <p>Belum ada pesan masuk.</p>
-      </div>`; return;
-    }
-
-    listEl.innerHTML = msgs.map(m => {
-      const dateStr = new Date(m.date).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-      return `
-      <div id="msg-${m.id}" style="
-        background:${m.read ? 'rgba(255,255,255,0.02)' : 'rgba(0,212,255,0.05)'};
-        border:1px solid ${m.read ? 'rgba(0,212,255,0.1)' : 'rgba(0,212,255,0.25)'};
-        border-radius:12px; padding:1.2rem 1.4rem; margin-bottom:0.9rem; transition:opacity 0.3s;
-      ">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.6rem;">
-          <div>
-            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#F0F4FF;font-size:0.97rem">${escHtml(m.name)}</span>
-            ${!m.read ? '<span style="background:#00D4FF;color:#0A0E1A;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle">BARU</span>' : ''}
-            <div style="font-size:0.8rem;color:#8892A4;margin-top:2px">${escHtml(m.email)}</div>
-          </div>
-          <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0">
-            <span style="font-size:0.75rem;color:#8892A4">${dateStr}</span>
-            ${!m.read ? `<button onclick="markRead('${m.id}')" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:#00D4FF;padding:3px 8px;border-radius:6px;font-size:0.72rem;cursor:pointer">✓ Baca</button>` : ''}
-            <button onclick="deleteMsg('${m.id}')" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);color:#FF6B6B;padding:3px 8px;border-radius:6px;font-size:0.72rem;cursor:pointer">✕</button>
-          </div>
-        </div>
-        <div style="font-size:0.85rem;font-weight:600;color:#00D4FF;margin-bottom:0.35rem">📌 ${escHtml(m.subject)}</div>
-        <div style="font-size:0.87rem;color:#8892A4;line-height:1.65;white-space:pre-wrap">${escHtml(m.message)}</div>
-      </div>`;
-    }).join('');
-  });
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function markRead(id) { dbMarkRead(id); }
-function deleteMsg(id) {
-  const el = document.getElementById('msg-' + id);
-  if (el) { el.style.opacity = '0'; setTimeout(() => dbDelete(id), 280); }
-  else dbDelete(id);
-}
-function clearAll() {
-  if (confirm('Hapus semua pesan? Aksi ini tidak bisa dibatalkan.')) dbClear();
-}
-function exportMessages() {
-  dbGetAll(msgs => {
-    const blob = new Blob([JSON.stringify(msgs, null, 2)], { type:'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'pesan_rafi_' + Date.now() + '.json';
-    a.click(); URL.revokeObjectURL(url);
-  });
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeEmailForm();
-    closeAdmin();
-    closeProjectModal();
-  }
-});
+function dbDelete(id){ if(firebaseOK){ db.ref('messages/'+id).remove().then(renderAdmin); }else{ lsSave(lsGet().filter(m=>String(m.id)!==String(id))); renderAdmin(); } }
+function dbMarkRead(id){ if(firebaseOK){ db.ref('messages/'+id+'/read').set(true).then(renderAdmin); }else{ const all=lsGet(); const m=all.find(x=>String(x.id)===String(id)); if(m){m.read=true;lsSave(all);} renderAdmin(); } }
+function dbClear(callback){ if(firebaseOK){ db.ref('messages').remove().then(()=>{renderAdmin();callback&&callback();}); }else{ localStorage.removeItem(DB_KEY); renderAdmin(); callback&&callback(); } }
+function dbGetAll(callback){ if(firebaseOK){ db.ref('messages').orderByChild('date').once('value',snap=>{ const msgs=[]; snap.forEach(child=>msgs.unshift({id:child.key,...child.val()})); callback(msgs); }); }else{ callback(lsGet()); } }
 </script>
 </body>
 </html>
