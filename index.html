@@ -470,6 +470,43 @@
       0%,100% { border-color: rgba(0,212,255,0.2); box-shadow: none; }
       50%      { border-color: var(--cyan); box-shadow: 0 0 18px rgba(0,212,255,0.25); }
     }
+    /* Saat user diberi peringatan, tombol explore "berdenyut" kuat supaya dilihat */
+    #exploreBtn.attention {
+      animation: exploreAttention 0.55s ease 2;
+    }
+    @keyframes exploreAttention {
+      0%, 100% { transform: scale(1);    box-shadow: 0 0 18px rgba(0,212,255,0.25); }
+      50%      { transform: scale(1.07); box-shadow: 0 0 32px rgba(0,212,255,0.6);  }
+    }
+
+    /* ═══ LOCK WARNING TOAST ═══ */
+    #lockToast {
+      position: fixed;
+      top: 5.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-12px);
+      z-index: 9997;
+      background: rgba(15,20,35,0.95);
+      border: 1px solid rgba(255,209,102,0.35);
+      color: var(--white);
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      max-width: min(380px, 88vw);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #lockToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    #lockToast .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
 
     .hero-scroll {
       position: absolute; bottom: 2.5rem; left: 5%;
@@ -718,10 +755,16 @@
 
 <!-- ═══ SCROLL HINT (panah bawah saat hero lock aktif) ═══ -->
 <div class="hero-scroll-hint" id="heroScrollHint">
-  <span>Klik tombol jelajahi portofolio untuk mulai</span>
+  <span>Klik tombol di bawah untuk mulai</span>
   <div class="hint-arrow"></div>
   <div class="hint-arrow"></div>
   <div class="hint-arrow"></div>
+</div>
+
+<!-- ═══ TOAST PERINGATAN SAAT NAVBAR DIKLIK SEBELUM HERO DIBUKA ═══ -->
+<div id="lockToast">
+  <span class="toast-icon">👆</span>
+  <span>Klik tombol <strong>"Jelajahi Portfolio"</strong> dulu untuk membuka halaman ini.</span>
 </div>
 
 <!-- ═══ BACKGROUND LAYERS ═══ -->
@@ -1215,6 +1258,32 @@
     document.getElementById('heroScrollHint').classList.remove('visible');
   }
 
+  /* ══ TOAST PERINGATAN: "klik Jelajahi Portfolio dulu" ══ */
+  let toastTimer = null;
+  function showLockToast() {
+    const toast = document.getElementById('lockToast');
+    const exploreBtn = document.getElementById('exploreBtn');
+
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+
+    /* bikin tombol Jelajahi Portfolio "berdenyut" supaya kelihatan jelas */
+    exploreBtn.classList.remove('attention');
+    void exploreBtn.offsetWidth; /* restart animasi kalau diklik berkali-kali */
+    exploreBtn.classList.add('attention');
+  }
+
+  /* Cegat semua klik link navbar (desktop) selama hero masih terkunci */
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', e => {
+      if (heroLocked) {
+        e.preventDefault();
+        showLockToast();
+      }
+    });
+  });
+
   /* Tombol "Jelajahi Portfolio" — unlock + transisi ke #about */
   function explorePortfolio(e) {
     e.preventDefault();
@@ -1328,7 +1397,16 @@
     document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
   });
   document.querySelectorAll('.mob-link').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+      if (heroLocked) {
+        e.preventDefault();
+        /* Tutup mobile menu dulu supaya toast kelihatan */
+        ham.classList.remove('open');
+        menu.classList.remove('open');
+        document.body.style.overflow = '';
+        showLockToast();
+        return;
+      }
       unlockScroll();
       ham.classList.remove('open');
       menu.classList.remove('open');
